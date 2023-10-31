@@ -124,14 +124,16 @@ def pose_joint_orientations(joint_names: List[str],
     return orientations
 
 
-def pose_joint_positions(joint_names: List[str],
+def pose_joint_positions(root_position: np.ndarray,
                          joint_parents: List[int],
                          joint_offsets: np.ndarray,
-                         joint_orientations: np.ndarray) -> List[np.ndarray]:
-    positions = [joint_offsets[0]]
+                         joint_orientations: np.ndarray) -> np.ndarray:
+    positions = np.empty_like(joint_offsets, dtype=np.float64)
+    positions[0] = root_position
 
-    for i in range(1, len(joint_parents)):
-        positions[joint_parents[i]] + joint_orientations[i].apply(joint_offsets[i])
+    for i in range(1, joint_offsets.shape[0]):
+        positions[i] = (positions[joint_parents[i]]
+                        + joint_orientations[joint_parents[i]].apply(joint_offsets[i]))
 
     return positions
 
@@ -153,7 +155,7 @@ def part2_forward_kinematics(joint_names: List[str],
         2. from_euler时注意使用大写的XYZ
     """
     joint_orientations = pose_joint_orientations(joint_names, joint_parents, motion_data[frame_id])
-    return (np.stack(pose_joint_positions(joint_names, joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
+    return (np.stack(pose_joint_positions(motion_data[frame_id, :3], joint_names, joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
             rotation_array_to_float_array(joint_orientations))
 
 
