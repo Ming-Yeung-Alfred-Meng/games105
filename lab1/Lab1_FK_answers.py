@@ -1,3 +1,4 @@
+from typing import List, Optional, Tuple
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 
@@ -20,23 +21,72 @@ def load_motion_data(bvh_file_path):
     return motion_data
 
 
-def part1_calculate_T_pose(bvh_file_path):
+def pose_from_bvh_lines(lines: List[str],
+                        joint_names: List[str],
+                        joint_parents: List[int],
+                        joint_offsets: List[List[float]],
+                        i: int = 0,
+                        parent_index: int = -1) -> Optional[int]:
+    my_joint_name_read = False
+    my_name_index = len(joint_names)
+
+    line = lines[i].strip()
+    while line != "}":
+
+        if line.startswith("JOINT") or line.startswith("ROOT"):
+            if my_joint_name_read:
+                i = pose_from_bvh_lines(lines,
+                                        joint_names,
+                                        joint_parents,
+                                        joint_offsets,
+                                        i,
+                                        my_name_index)
+            else:
+                joint_parents.append(parent_index)
+
+                joint_names.append(line.split()[-1])
+                my_joint_name_read = True
+
+        elif line.startswith("OFFSET"):
+            joint_offsets.append([float(offset) for offset in line.split()[-3:]])
+
+        elif line.startswith("End"):
+            joint_parents.append(my_name_index)
+
+            joint_names.append(joint_names[my_name_index] + "_end")
+            joint_offsets.append([float(offset) for offset in lines[i + 2].split()[-3:]])
+            i += 3
+
+        i += 1
+        line = lines[i].strip()
+
+    return i
+
+
+def part1_calculate_T_pose(bvh_file_path: str) -> Tuple[List[str], List[int], np.ndarray]:
     """请填写以下内容
-    输入： bvh 文件路径
-    输出:
-        joint_name: List[str]，字符串列表，包含着所有关节的名字
-        joint_parent: List[int]，整数列表，包含着所有关节的父关节的索引,根节点的父关节索引为-1
-        joint_offset: np.ndarray，形状为(M, 3)的numpy数组，包含着所有关节的偏移量
+        输入： bvh 文件路径
+        输出:
+            joint_name: List[str]，字符串列表，包含着所有关节的名字
+            joint_parent: List[int]，整数列表，包含着所有关节的父关节的索引,根节点的父关节索引为-1
+            joint_offset: np.ndarray，形状为(M, 3)的numpy数组，包含着所有关节的偏移量
 
     Tips:
         joint_name顺序应该和bvh一致
     """
+    joint_names = []
+    joint_parents = []
+    joint_offsets = []
 
+    with open(bvh_file_path, 'r') as bvh:
+        lines = bvh.readlines()
 
-    joint_name = None
-    joint_parent = None
-    joint_offset = None
-    return joint_name, joint_parent, joint_offset
+        pose_from_bvh_lines(lines,
+                            joint_names,
+                            joint_parents,
+                            joint_offsets)
+
+    return joint_names, joint_parents, np.array(joint_offsets, dtype=np.float64)
 
 
 def part2_forward_kinematics(joint_name, joint_parent, joint_offset, motion_data, frame_id):

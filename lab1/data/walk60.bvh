@@ -1,7 +1,7 @@
 HIERARCHY
 ROOT RootJoint
 {
-    OFFSET   0.000000   0.000000   0.000000
+    OFFSET   0.000000   3.000000   0.000000
     CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation
     JOINT lHip
     {
