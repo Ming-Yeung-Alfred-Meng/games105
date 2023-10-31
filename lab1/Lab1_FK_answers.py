@@ -93,10 +93,7 @@ def rotation_array_to_float_array(rotations: np.ndarray) -> np.ndarray:
     orientations_actual = []
 
     for r in rotations:
-        if r is not None:
-            orientations_actual.append(r.as_quat())
-        else:
-            orientations_actual.append([np.nan, np.nan, np.nan, np.nan])
+        orientations_actual.append(r.as_quat())
 
     return np.stack(orientations_actual,
                     axis=0,
@@ -120,13 +117,15 @@ def pose_joint_orientations(joint_names: List[str],
 
         joint_index += 1
         if joint_names[joint_index].endswith("end"):
+            orientations[joint_index] = R.from_quat([1., 0., 0., 0.])
             joint_index += 1
         rotation_index += 1
 
     return orientations
 
 
-def pose_joint_positions(joint_parents: List[int],
+def pose_joint_positions(joint_names: List[str],
+                         joint_parents: List[int],
                          joint_offsets: np.ndarray,
                          joint_orientations: np.ndarray) -> List[np.ndarray]:
     positions = [joint_offsets[0]]
@@ -154,7 +153,7 @@ def part2_forward_kinematics(joint_names: List[str],
         2. from_euler时注意使用大写的XYZ
     """
     joint_orientations = pose_joint_orientations(joint_names, joint_parents, motion_data[frame_id])
-    return (np.stack(pose_joint_positions(joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
+    return (np.stack(pose_joint_positions(joint_names, joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
             rotation_array_to_float_array(joint_orientations))
 
 
