@@ -1,5 +1,5 @@
 import unittest
-import lab1.Lab1_FK_answers as l
+from lab1.Lab1_FK_answers import *
 import numpy as np
 
 
@@ -8,7 +8,7 @@ class CalculateTPose(unittest.TestCase):
         bvh_path = "../data/truncated_walk60.bvh"
         (joint_names_actual,
          joint_parents_actual,
-         joint_offsets_actual) = l.part1_calculate_T_pose(bvh_path)
+         joint_offsets_actual) = part1_calculate_T_pose(bvh_path)
 
         joint_names_expected = ["RootJoint",
                                 "lHip", "lHip_end",
