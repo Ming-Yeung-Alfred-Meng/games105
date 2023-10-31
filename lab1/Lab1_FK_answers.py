@@ -26,7 +26,7 @@ def pose_from_bvh_lines(lines: List[str],
                         joint_parents: List[int],
                         joint_offsets: List[List[float]],
                         i: int = 0,
-                        parent_index: int = -1) -> Optional[int]:
+                        parent_index: int = -1) -> int:
     my_joint_name_read = False
     my_name_index = len(joint_names)
 
