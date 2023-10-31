@@ -89,21 +89,34 @@ def part1_calculate_T_pose(bvh_file_path: str) -> Tuple[List[str], List[int], np
     return joint_names, joint_parents, np.array(joint_offsets, dtype=np.float64)
 
 
+def rotation_array_to_float_array(rotations: np.ndarray) -> np.ndarray:
+    orientations_actual = []
+
+    for r in rotations:
+        if r is not None:
+            orientations_actual.append(r.as_quat())
+        else:
+            orientations_actual.append([np.nan, np.nan, np.nan, np.nan])
+
+    return np.stack(orientations_actual,
+                    axis=0,
+                    dtype=np.float64)
+
+
 def pose_joint_orientations(joint_names: List[str],
                             joint_parents: List[int],
-                            pose: np.ndarray) -> List[R]:
+                            pose: np.ndarray) -> np.ndarray:
     rotations = pose.reshape(-1, 3)[1:]
-    orientations = [R.from_euler("XYZ", rotations[0], degrees=True)]
-    orientation_indices = np.empty_like(joint_names, dtype=np.int64)
-    orientation_indices[0] = 0
+
+    orientations = np.empty_like(joint_names, dtype=object)
+    orientations[0] = R.from_euler("XYZ", rotations[0], degrees=True)
 
     joint_index = 1
     rotation_index = 1
 
     while joint_index < len(joint_names):
-        orientations.append(orientations[orientation_indices[joint_parents[joint_index]]]
-                            * R.from_euler("XYZ", rotations[rotation_index], degrees=True))
-        orientation_indices[joint_index] = rotation_index
+        orientations[joint_index] = (orientations[joint_parents[joint_index]]
+                                     * R.from_euler("XYZ", rotations[rotation_index], degrees=True))
 
         joint_index += 1
         if joint_names[joint_index].endswith("end"):
@@ -115,7 +128,7 @@ def pose_joint_orientations(joint_names: List[str],
 
 def pose_joint_positions(joint_parents: List[int],
                          joint_offsets: np.ndarray,
-                         joint_orientations: List[R]) -> List[np.ndarray]:
+                         joint_orientations: np.ndarray) -> List[np.ndarray]:
     positions = [joint_offsets[0]]
 
     for i in range(1, len(joint_parents)):
@@ -140,9 +153,9 @@ def part2_forward_kinematics(joint_names: List[str],
         1. joint_orientations的四元数顺序为(x, y, z, w)
         2. from_euler时注意使用大写的XYZ
     """
-    joint_orientations = pose_joint_orientations(joint_parents, motion_data[frame_id])
+    joint_orientations = pose_joint_orientations(joint_names, joint_parents, motion_data[frame_id])
     return (np.stack(pose_joint_positions(joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
-            np.stack([o.as_quat() for o in joint_orientations], axis=0, dtype=np.float64))
+            rotation_array_to_float_array(joint_orientations))
 
 
 def part3_retarget_func(T_pose_bvh_path, A_pose_bvh_path):
