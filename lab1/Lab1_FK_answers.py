@@ -89,7 +89,46 @@ def part1_calculate_T_pose(bvh_file_path: str) -> Tuple[List[str], List[int], np
     return joint_names, joint_parents, np.array(joint_offsets, dtype=np.float64)
 
 
-def part2_forward_kinematics(joint_name, joint_parent, joint_offset, motion_data, frame_id):
+def pose_joint_orientations(joint_names: List[str],
+                            joint_parents: List[int],
+                            pose: np.ndarray) -> List[R]:
+    rotations = pose.reshape(-1, 3)[1:]
+    orientations = [R.from_euler("XYZ", rotations[0], degrees=True)]
+    orientation_indices = np.empty_like(joint_names, dtype=np.int64)
+    orientation_indices[0] = 0
+
+    joint_index = 1
+    rotation_index = 1
+
+    while joint_index < len(joint_names):
+        orientations.append(orientations[orientation_indices[joint_parents[joint_index]]]
+                            * R.from_euler("XYZ", rotations[rotation_index], degrees=True))
+        orientation_indices[joint_index] = rotation_index
+
+        joint_index += 1
+        if joint_names[joint_index].endswith("end"):
+            joint_index += 1
+        rotation_index += 1
+
+    return orientations
+
+
+def pose_joint_positions(joint_parents: List[int],
+                         joint_offsets: np.ndarray,
+                         joint_orientations: List[R]) -> List[np.ndarray]:
+    positions = [joint_offsets[0]]
+
+    for i in range(1, len(joint_parents)):
+        positions[joint_parents[i]] + joint_orientations[i].apply(joint_offsets[i])
+
+    return positions
+
+
+def part2_forward_kinematics(joint_names: List[str],
+                             joint_parents: List[int],
+                             joint_offsets: np.ndarray,
+                             motion_data: np.ndarray,
+                             frame_id: int) -> Tuple[np.ndarray, np.ndarray]:
     """请填写以下内容
     输入: part1 获得的关节名字，父节点列表，偏移量列表
         motion_data: np.ndarray，形状为(N,X)的numpy数组，其中N为帧数，X为Channel数
@@ -101,9 +140,9 @@ def part2_forward_kinematics(joint_name, joint_parent, joint_offset, motion_data
         1. joint_orientations的四元数顺序为(x, y, z, w)
         2. from_euler时注意使用大写的XYZ
     """
-    joint_positions = None
-    joint_orientations = None
-    return joint_positions, joint_orientations
+    joint_orientations = pose_joint_orientations(joint_parents, motion_data[frame_id])
+    return (np.stack(pose_joint_positions(joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
+            np.stack([o.as_quat() for o in joint_orientations], axis=0, dtype=np.float64))
 
 
 def part3_retarget_func(T_pose_bvh_path, A_pose_bvh_path):
