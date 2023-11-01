@@ -155,7 +155,7 @@ def part2_forward_kinematics(joint_names: List[str],
         2. from_euler时注意使用大写的XYZ
     """
     joint_orientations = pose_joint_orientations(joint_names, joint_parents, motion_data[frame_id])
-    return (np.stack(pose_joint_positions(motion_data[frame_id, :3], joint_names, joint_parents, joint_offsets, joint_orientations), axis=0, dtype=np.float64),
+    return (pose_joint_positions(motion_data[frame_id, :3], joint_parents, joint_offsets, joint_orientations),
             rotation_array_to_float_array(joint_orientations))
 
 

@@ -86,16 +86,17 @@ class PoseJointPositions(unittest.TestCase):
                                                joint_parents,
                                                pose)
 
-        positions_actual = np.stack(pose_joint_positions(joint_parents,
-                                                         joint_offsets,
-                                                         orientations),
-                                    axis=0,
-                                    dtype=np.float64)
+        positions_actual = pose_joint_positions(pose[:3],
+                                                joint_parents,
+                                                joint_offsets,
+                                                orientations)
 
-        positions_expected = np.array([[0.000000, 0.000000, 0.000000],
-                                       [0.09840073, -0.05229027, -0.01498231],
-                                       [0.13208152, 0.0602358, -0.05127781, 0.98807728],
-                                       [-0.01987982, 0.04116234, 0.03973097, 0.99816427]])
+        positions_expected = np.array([[-0.001735, 0.855388, 0.315499],
+                                       [0.09666573, 0.80309773, 0.30051669],
+                                       [0.11095962, 0.7908955, 0.3584027],
+                                       [-0.10155524, 0.80495475, 0.32706845],
+                                       [-0.14962567, 0.4114162, 0.2225857],
+                                       [-0.15488649, 0.41520896, 0.28309966]])
 
         self.assertTrue(np.allclose(positions_actual, positions_expected))
 
