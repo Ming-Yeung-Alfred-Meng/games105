@@ -1,6 +1,6 @@
-from viewer import SimpleViewer
+from lab1.viewer import SimpleViewer
 import numpy as np
-from Lab1_FK_answers import *
+from lab1.Lab1_FK_answers import *
 
 
 def part1(viewer, bvh_file_path):

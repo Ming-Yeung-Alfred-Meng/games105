@@ -1,6 +1,6 @@
-from task1_forward_kinematics import *
+from lab1.task1_forward_kinematics import *
 from scipy.spatial.transform import Rotation as R
-from Lab1_IK_answers import *
+from lab1.Lab1_IK_answers import *
 
 
 class MetaData:

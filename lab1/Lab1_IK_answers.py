@@ -3,6 +3,17 @@ import numpy as np
 from scipy.spatial.transform import Rotation as R
 
 
+def update_chain_orientations(path: List[int],
+                              start: int,
+                              rotation,
+                              joint_orientations: np.ndarray) -> None:
+    """
+    Update the orientations of joints from index "start" to the end effector (exclusive) in a chain of joints defined by "path".
+    """
+    for i in path[start:-1]:
+        joint_orientations[i] = rotation * R.from_quat(joint_orientations[i]).as_quat()
+
+
 def joint_offsets_from_positions(joint_positions: np.ndarray,
                                  joint_parents: List[int]) -> np.ndarray:
     offsets = np.empty_like(joint_positions)
