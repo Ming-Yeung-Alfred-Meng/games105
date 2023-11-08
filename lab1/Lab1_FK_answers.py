@@ -117,7 +117,7 @@ def pose_joint_orientations(joint_names: List[str],
 
         joint_index += 1
         if joint_names[joint_index].endswith("end"):
-            orientations[joint_index] = R.from_quat([1., 0., 0., 0.])
+            orientations[joint_index] = R.from_quat([0., 0., 0., 1.])
             joint_index += 1
         rotation_index += 1
 
