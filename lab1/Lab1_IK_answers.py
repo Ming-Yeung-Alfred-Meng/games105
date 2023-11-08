@@ -11,7 +11,7 @@ def update_chain_orientations(path: List[int],
     Update the orientations of joints from index "start" to the end effector (exclusive) in a chain of joints defined by "path".
     """
     for i in path[start:-1]:
-        joint_orientations[i] = rotation * R.from_quat(joint_orientations[i]).as_quat()
+        joint_orientations[i] = (rotation * R.from_quat(joint_orientations[i])).as_quat()
 
 
 def joint_offsets_from_positions(joint_positions: np.ndarray,
