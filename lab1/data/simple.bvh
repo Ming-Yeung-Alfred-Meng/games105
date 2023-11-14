@@ -1,0 +1,19 @@
+HIERARCHY
+ROOT RootJoint
+{
+    OFFSET   0.000000   0.000000   0.000000
+    CHANNELS 6 Xposition Yposition Zposition Xrotation Yrotation Zrotation
+    JOINT Kink1
+    {
+        OFFSET  1.000000   0.000000   0.000000
+        CHANNELS 3 Xrotation Yrotation Zrotation
+        End Site
+        {
+            OFFSET  1.000000   0.000000   0.000000
+        }
+    }
+}
+MOTION
+Frames: 182
+Frame Time:   0.016667
+ 0.000000   0.000000   0.000000   0.000000   0.000000   0.000000  0.000000   0.000000   0.000000

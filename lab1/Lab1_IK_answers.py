@@ -21,9 +21,7 @@ def part1_inverse_kinematics(meta_data,
         joint_positions: 计算得到的关节位置，是一个numpy数组，shape为(M, 3)，M为关节数
         joint_orientations: 计算得到的关节朝向，是一个numpy数组，shape为(M, 4)，M为关节数
     """
-    path, path_names, _, _ = meta_data.get_path_from_root_to_end()
-
-    return cyclic_coordinate_descent(path,
+    return cyclic_coordinate_descent(meta_data.get_path_from_root_to_end()[0],
                                      target_end,
                                      meta_data.joint_initial_position,
                                      meta_data.joint_parent,
