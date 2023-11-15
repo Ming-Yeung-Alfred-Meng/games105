@@ -2,7 +2,7 @@ from typing import List, Tuple
 import numpy as np
 from scipy.spatial.transform import Rotation as R
 from lab1.Lab1_FK_answers import *
-from inverse_kinematics_methods.methods import *
+from lab1.inverse_kinematics_methods.methods import *
 
 
 def part1_inverse_kinematics(meta_data,
