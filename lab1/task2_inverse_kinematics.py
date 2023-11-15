@@ -34,23 +34,27 @@ class MetaData:
         end2root = [self.joint_name.index(self.end_joint)]
         while self.joint_parent[end2root[-1]] != -1:
             end2root.append(self.joint_parent[end2root[-1]]) # when loop finishes, root i.e. 0 is in end2root.
-        end2root_copy = end2root.copy()
 
         # 从root节点开始，一直往上找，直到找到腰部节点
         start2root = [self.joint_name.index(self.start_joint)]
         while self.joint_parent[start2root[-1]] != -1:
             start2root.append(self.joint_parent[start2root[-1]]) # when loop finishes, root i.e. 0 is in start2root.
-        start2root_copy = start2root.copy()
 
         # 合并路径，消去重复的节点
         while end2root and start2root and start2root[-1] == end2root[-1]:
             end2root.pop()
             a = start2root.pop()
 
+        if a == 0:
+            root_index = len(start2root)
+        else:
+            root_index = -1
+
         start2root.append(a)
         start2end = start2root + list(reversed(end2root))
         path_name = [self.joint_name[i] for i in start2end]
-        return start2end, path_name, end2root_copy, start2root_copy
+
+        return np.array(start2end), path_name, root_index
 
 
 def part1_simple(viewer, target_pos):
