@@ -4,7 +4,7 @@ from lab1.Lab1_IK_answers import *
 
 
 class MetaData:
-    def __init__(self, joint_name, joint_parent, joint_initial_position, root_joint, end_joint):
+    def __init__(self, joint_name, joint_parent, joint_initial_position, start_joint, end_joint):
         """
         一些固定信息，其中joint_initial_position是T-pose下的关节位置，可以用于计算关节相互的offset
         root_joint是固定节点的索引，并不是RootJoint节点
@@ -12,7 +12,7 @@ class MetaData:
         self.joint_name = joint_name
         self.joint_parent = joint_parent
         self.joint_initial_position = joint_initial_position
-        self.root_joint = root_joint
+        self.start_joint = start_joint
         self.end_joint = end_joint
 
     def get_path_from_root_to_end(self):
@@ -31,24 +31,26 @@ class MetaData:
         """
 
         # 从end节点开始，一直往上找，直到找到腰部节点
-        path1 = [self.joint_name.index(self.end_joint)]
-        while self.joint_parent[path1[-1]] != -1:
-            path1.append(self.joint_parent[path1[-1]])
+        end2root = [self.joint_name.index(self.end_joint)]
+        while self.joint_parent[end2root[-1]] != -1:
+            end2root.append(self.joint_parent[end2root[-1]]) # when loop finishes, root i.e. 0 is in end2root.
+        end2root_copy = end2root.copy()
 
         # 从root节点开始，一直往上找，直到找到腰部节点
-        path2 = [self.joint_name.index(self.root_joint)]
-        while self.joint_parent[path2[-1]] != -1:
-            path2.append(self.joint_parent[path2[-1]])
+        start2root = [self.joint_name.index(self.start_joint)]
+        while self.joint_parent[start2root[-1]] != -1:
+            start2root.append(self.joint_parent[start2root[-1]]) # when loop finishes, root i.e. 0 is in start2root.
+        start2root_copy = start2root.copy()
 
         # 合并路径，消去重复的节点
-        while path1 and path2 and path2[-1] == path1[-1]:
-            path1.pop()
-            a = path2.pop()
+        while end2root and start2root and start2root[-1] == end2root[-1]:
+            end2root.pop()
+            a = start2root.pop()
 
-        path2.append(a)
-        path = path2 + list(reversed(path1))
-        path_name = [self.joint_name[i] for i in path]
-        return path, path_name, path1, path2
+        start2root.append(a)
+        start2end = start2root + list(reversed(end2root))
+        path_name = [self.joint_name[i] for i in start2end]
+        return start2end, path_name, end2root_copy, start2root_copy
 
 
 def part1_simple(viewer, target_pos):
