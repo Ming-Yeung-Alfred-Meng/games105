@@ -111,36 +111,33 @@ def forward(joint_positions: np.ndarray,
 
 
 def link_orientations(orientations: np.ndarray,
+                      parents: List[int],
                       start2end: List[int],
                       root_index: int):
     """
-    Return orientations of links in the manipulator, which are updated during the learning process.
+    Return scipy rotations representing the orientations of links in the manipulator, and their indices into the
+    array of all orientations.
     @param orientations: n x 4 numpy array of orientations of all joints.
+    @param parents: parents[i] stores the index of i-th joint's parent.
     @param start2end: indices of joints in the manipulator.
     @param root_index: index of the root, i.e. 0 in "start2end".
-    @return: m scipy rotations of orientations of joints in the manipulator.
+    @return: m scipy rotations of orientations of joints in the manipulator, and their indices into "orientations".
     """
-    if root_index == 0:
-        return R.from_quat(orientations[parents][start2end[:-1]])
-    elif 0 < root_index < len(start2end) - 1:
-        return R.from_quat(orientations[parents][start2end[1:-1]])
-    elif root_index == len(start2end) - 1:
-        return R.from_quat(orientations[parents][start2end[1:]])
-    elif root_index == -1:
-        return R.from_quat(orientations[parents][start2end[:-1]])
-    else:
-        exit(f"root_index = {root_index}")
+    assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
 
-    # if root_index == 0:
-    #     return R.from_quat(orientations[start2end[:-1]])
-    # elif 0 < root_index < len(start2end) - 1:
-    #     return R.from_quat(orientations[start2end[1:-1]])
-    # elif root_index == len(start2end) - 1:
-    #     return R.from_quat(orientations[start2end[1:]])
-    # elif root_index == -1:
-    #     return R.from_quat(orientations[start2end[:-1]])
-    # else:
-    #     exit(f"root_index = {root_index}")
+    if root_index == 0:
+        indices = start2end[1:]
+    elif 0 < root_index < len(start2end) - 1:
+        indices = start2end
+    elif root_index == len(start2end) - 1:
+        indices = start2end[:-1]
+    else: # root_index == -1
+        if parents[start2end[0]] != start2end[0]:
+            indices = start2end[1:]
+        else:
+            indices = start2end[:-1]
+
+    return R.from_quat(orientations[indices]), indices.copy()
 
 
 def manipulator_links(joint_positions: np.ndarray,
