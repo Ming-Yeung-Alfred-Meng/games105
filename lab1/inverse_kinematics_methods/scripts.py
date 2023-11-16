@@ -132,10 +132,10 @@ def manipulator_links(joint_positions: np.ndarray,
 
 
 def update_joint_orientations(joint_orientations: np.ndarray,
-                              orientations: R,
+                              orientations: np.ndarray,
                               indices: np.ndarray):
     result = joint_orientations.copy()
-    result[indices] = orientations.as_quat()
+    result[indices] = orientations
     return result
 
 
