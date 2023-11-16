@@ -54,7 +54,7 @@ class PoseJointOrientations(unittest.TestCase):
 
         orientations_actual = pose_joint_orientations(joint_names,
                                                       joint_parents,
-                                                      pose).as_quat()
+                                                      pose)
 
         orientations_expected = np.array([[0.017026, 0.06643844, -0.00578745, 0.99762847],
                                           [0.11351008, 0.03868307, -0.02932178, 0.9923504],

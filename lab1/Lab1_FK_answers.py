@@ -102,14 +102,14 @@ def rotation_array_to_float_array(rotations: np.ndarray) -> np.ndarray:
 
 def pose_joint_orientations(joint_names: List[str],
                             joint_parents: List[int],
-                            pose: np.ndarray) -> R:
+                            pose: np.ndarray) -> np.ndarray:
     """
 
     @param joint_names: names of the joints.
     @param joint_parents: joint_parents[i] is the index of the parent of the i-th joint.
     @param pose: an array of motion data of one frame. The first three entries are the root positions, and the rest are
     Euler angles, as specified in the bvh file.
-    @return: Scipy rotations, each representing the orientation of the vector(s) from
+    @return: m x 4 array of orientations of vector(s) from
     a joint to its child/children.
     """
     rotations = pose.reshape(-1, 3)[1:]
@@ -130,22 +130,23 @@ def pose_joint_orientations(joint_names: List[str],
             joint_index += 1
         rotation_index += 1
 
-    return orientations
+    return orientations.as_quat()
 
 
 def pose_joint_positions(root_position: np.ndarray,
                          joint_parents: List[int],
                          joint_offsets: np.ndarray,
-                         joint_orientations: R) -> np.ndarray:
+                         joint_orientations: np.ndarray) -> np.ndarray:
     """
     Return joint positions.
     @param root_position: 3 array of root position
     @param joint_parents: joint_parents[i] is the index of the parent of the i-th joint.
     @param joint_offsets: m x 3 array in which each row is the vector from a joint's parent to itself.
-    @param joint_orientations: Scipy rotations, each representing the orientation of the vector(s) from
+    @param joint_orientations: m x 4 array of orientations of the vector(s) from
     a joint to its child/children.
     @return: m x 3 array in which each row is a joint position
     """
+    joint_orientations = R.from_quat(joint_orientations)
     positions = np.empty_like(joint_offsets, dtype=np.float64)
     positions[0] = root_position
 
@@ -174,7 +175,7 @@ def part2_forward_kinematics(joint_names: List[str],
     """
     joint_orientations = pose_joint_orientations(joint_names, joint_parents, motion_data[frame_id])
     return (pose_joint_positions(motion_data[frame_id, :3], joint_parents, joint_offsets, joint_orientations),
-            joint_orientations.as_quat())
+            joint_orientations)
 
 
 def part3_retarget_func(T_pose_bvh_path, A_pose_bvh_path):

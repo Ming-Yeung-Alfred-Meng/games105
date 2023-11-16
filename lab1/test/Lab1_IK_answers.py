@@ -30,12 +30,12 @@ class JointOffsetsFromPositions(unittest.TestCase):
     def test_reversed(self):
         root_position = np.array([-0.001735, 0.855388, 0.315499])
         joint_parents = [-1, 0, 1, 0, 3, 4]
-        orientations = np.array([R.from_quat([0., 0., 0., 1.]),
-                                 R.from_quat([0., 0., 0., 1.]),
-                                 R.from_quat([0., 0., 0., 1.]),
-                                 R.from_quat([0., 0., 0., 1.]),
-                                 R.from_quat([0., 0., 0., 1.]),
-                                 R.from_quat([0., 0., 0., 1.])])
+        orientations = np.array([[0., 0., 0., 1.],
+                                 [0., 0., 0., 1.],
+                                 [0., 0., 0., 1.],
+                                 [0., 0., 0., 1.],
+                                 [0., 0., 0., 1.],
+                                 [0., 0., 0., 1.]])
         offsets = np.array([[0.000000, 0.000000, 0.000000],
                             [0.09840073, -0.05229027, -0.01498231],
                             [0.01429389, -0.01220223, 0.05788601],
