@@ -102,19 +102,19 @@ def rotation_array_to_float_array(rotations: np.ndarray) -> np.ndarray:
 
 def pose_joint_orientations(joint_names: List[str],
                             joint_parents: List[int],
-                            pose: np.ndarray) -> np.ndarray:
+                            pose: np.ndarray) -> R:
     """
 
     @param joint_names: names of the joints.
     @param joint_parents: joint_parents[i] is the index of the parent of the i-th joint.
     @param pose: an array of motion data of one frame. The first three entries are the root positions, and the rest are
     Euler angles, as specified in the bvh file.
-    @return: m array. Each entry is a scipy rotation representing the orientation of the vector(s) from
+    @return: Scipy rotations, each representing the orientation of the vector(s) from
     a joint to its child/children.
     """
     rotations = pose.reshape(-1, 3)[1:]
 
-    orientations = np.empty_like(joint_names, dtype=object)
+    orientations = R.from_euler("XYZ", np.empty(shape=(len(joint_names), 3), dtype=np.float64))
     orientations[0] = R.from_euler("XYZ", rotations[0], degrees=True)
 
     joint_index = 1

@@ -52,16 +52,16 @@ class PoseJointOrientations(unittest.TestCase):
         bvh_path = "../data/truncated_walk60.bvh"
         pose = load_motion_data(bvh_path)[0]
 
-        orientations_actual = rotation_array_to_float_array(pose_joint_orientations(joint_names,
-                                                                                    joint_parents,
-                                                                                    pose))
+        orientations_actual = pose_joint_orientations(joint_names,
+                                                      joint_parents,
+                                                      pose).as_quat()
 
         orientations_expected = np.array([[0.017026, 0.06643844, -0.00578745, 0.99762847],
                                           [0.11351008, 0.03868307, -0.02932178, 0.9923504],
-                                          [1., 0., 0., 0.],
+                                          [0., 0., 0., 1.],
                                           [0.13208152, 0.0602358, -0.05127781, 0.98807728],
                                           [-0.01987982, 0.04116234, 0.03973097, 0.99816427],
-                                          [1., 0., 0., 0.]])
+                                          [0., 0., 0., 1.]])
 
         self.assertTrue(np.allclose(orientations_actual, orientations_expected))
 
