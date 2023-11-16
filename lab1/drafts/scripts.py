@@ -41,20 +41,12 @@ def plot_manipulator(positions: np.ndarray,
     ax.view_init(elev=20, azim=10, vertical_axis='y')
 
 
-# def jacobian_transpose(joint_positions: np.ndarray,
-#                        joint_parents: List[int],
-#                        path: List[int]) -> np.ndarray:
-#     current_joint_offsets = joint_positions - joint_positions[joint_parents]
-#     current_joint_offsets[0].fill(0.)
-#
-#     return np.cross(np.eye(3), current_joint_offsets[path[1:], None, :]).reshape(-1, 3)
-
-
 def jacobian_transpose(links: np.ndarray,
                        root_index: int):
     """
     Compute the transpose of the Jacobian of the manipulator formed by "links". Assume the links use Euler rotations
     in the same canonical coordinate system.
+    @param root_index: index of the root, i.e. 0 in "start2end".
     @param links: m x 3 numpy array of links.
     @return: 3m x 3 numpy array. Transpose of the Jacobian of end effector position w.r.t. all joint angles.
     """
@@ -78,10 +70,10 @@ def backward(links: np.ndarray,
     return jacobian_transpose(links, root_index) @ error
 
 
-def step(loss_gradient,
-         learning_rate,
+def step(orientations: R,
          links: np.ndarray,
-         orientations):
+         loss_gradient: np.ndarray,
+         learning_rate: float = 1) -> Tuple[np.ndarray, R]:
     """
     Update links and their orientations.
     @param loss_gradient: m array of gradient of loss function w.r.t. joint angles.
@@ -115,7 +107,7 @@ def forward(joint_positions: np.ndarray,
 def link_orientations(orientations: np.ndarray,
                       parents: List[int],
                       start2end: List[int],
-                      root_index: int):
+                      root_index: int) -> Tuple[R, np.ndarray]:
     """
     Return scipy rotations representing the orientations of links in the manipulator, and their indices into the
     array of all orientations.
@@ -127,19 +119,21 @@ def link_orientations(orientations: np.ndarray,
     """
     assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
 
+    parents = np.array(parents)
+
     if root_index == 0:
-        indices = start2end[1:]
+        indices = parents[start2end[1:]]
     elif 0 < root_index < len(start2end) - 1:
-        indices = start2end
+        indices = parents[start2end]
     elif root_index == len(start2end) - 1:
-        indices = start2end[:-1]
+        indices = parents[start2end[:-1]]
     else:  # root_index == -1
         if parents[start2end[0]] != start2end[0]:
-            indices = start2end[1:]
+            indices = parents[start2end[1:]]
         else:
-            indices = start2end[:-1]
+            indices = parents[start2end[:-1]]
 
-    return R.from_quat(orientations[indices]), indices.copy()
+    return R.from_quat(orientations[indices]), indices
 
 
 def manipulator_links(joint_positions: np.ndarray,
@@ -153,8 +147,12 @@ def manipulator_links(joint_positions: np.ndarray,
     return joint_positions[start2end][1:] - joint_positions[start2end][:-1]
 
 
-def update_joint_orientations(joint_orientations, orientations):
-    pass
+def update_joint_orientations(joint_orientations: np.ndarray,
+                              orientations: R,
+                              indices: np.ndarray):
+    result = joint_orientations.copy()
+    result[indices] = orientations.as_quat()
+    return result
 
 
 def link_position(joint_positions: np.ndarray,
@@ -182,24 +180,24 @@ def gradient_descent(positions: np.ndarray,
                      learning_rate: float = 1,
                      max_iterations: int = 10,
                      max_error: float = 0.01) -> Tuple[np.ndarray, np.ndarray]:
-    orientations = link_orientations(joint_orientations, parents,
-                                     start2end, root_index)  # the same orientation may occur twice, as desired.
-    links = manipulator_links(positions, start2end)  # include all links connect the root, as desired.
+    orientations, indices = link_orientations(joint_orientations, parents, start2end, root_index)
+    # the same orientation may occur twice, as desired.
+    links = manipulator_links(positions, start2end)
+    # include all links connect the root, as desired.
     error, error_norm = forward(positions, start2end, links, target)
 
     iteration_count = 0
     while iteration_count < max_iterations and max_error < error_norm:
-        loss_gradient = backward(links, error)
+        loss_gradient = backward(links, root_index, error)
 
-        links, orientations = step(loss_gradient, learning_rate, links, orientations)
+        links, orientations = step(orientations, links, loss_gradient, learning_rate)
 
         error, error_norm = forward(positions, start2end, links, target)
 
         iteration_count += 1
 
-    joint_orientations = update_joint_orientations(joint_orientations, orientations, start2end, root_index)
-    new_root = link_position(positions, start2end, links, root_index)
+    joint_orientations = update_joint_orientations(joint_orientations, orientations, indices)
 
-    return (pose_joint_positions(new_root, parents,
-                                 joint_offsets, joint_orientations),
+    return (pose_joint_positions(link_position(positions, start2end, links, root_index),
+                                 parents, joint_offsets, joint_orientations),
             joint_orientations)
