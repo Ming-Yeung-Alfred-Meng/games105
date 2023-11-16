@@ -5,6 +5,8 @@ from lab1.inverse_kinematics_methods.scripts import *
 from lab1.Lab1_FK_answers import *
 
 
+# TODO: no longer working after improvements on its helper functions. More work to do.
+#  The quality of the implementation of ccd and its helper functions is overall poor.
 def cyclic_coordinate_descent(path: List[int],
                               target: np.ndarray,
                               initial_joint_positions: np.ndarray,
