@@ -22,7 +22,7 @@ def update_chain_orientations(path: List[int],
     Update the orientations of joints from index "start" to the end effector (exclusive) in a chain of joints defined by "path".
     """
     for i in path[start:-1]:
-        joint_orientations[i] = rotation * joint_orientations[i]
+        joint_orientations[i] = (rotation * R.from_quat(joint_orientations[i])).as_quat()
 
 
 def jacobian_transpose(links: np.ndarray,
@@ -134,6 +134,13 @@ def manipulator_links(joint_positions: np.ndarray,
 def update_joint_orientations(joint_orientations: np.ndarray,
                               orientations: np.ndarray,
                               indices: np.ndarray):
+    """
+    Update selected orientations.
+    @param joint_orientations: n x 4 array of orientations, in which some of them are being updated.
+    @param orientations: o x 4 new orientations.
+    @param indices: indices into joint_orientations of orientations to be updated.
+    @return: n x 4 array of updated orientations.
+    """
     result = joint_orientations.copy()
     result[indices] = orientations
     return result
