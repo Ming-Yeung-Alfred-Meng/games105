@@ -17,8 +17,8 @@ def cyclic_coordinate_descent(path: List[int],
     assert order == 1 or order == -1
     assert 2 <= len(path)
 
-    joint_offsets = s.joint_offsets_from_positions(initial_joint_positions,
-                                                   joint_parents)
+    joint_offsets = joint_offsets_from_positions(initial_joint_positions,
+                                                 joint_parents)
     joint_orientations = [R.from_quat(o) for o in joint_orientations]
 
     iteration_count = 0
@@ -34,11 +34,11 @@ def cyclic_coordinate_descent(path: List[int],
         angle_of_rotation = np.arccos(np.dot(joint_to_end, joint_to_target)
                                       / (np.linalg.norm(joint_to_end) * np.linalg.norm(joint_to_target)))
 
-        s.update_chain_orientations(path,
-                                    i,
-                                    R.from_rotvec(
-                                        angle_of_rotation * axis_of_rotation / np.linalg.norm(axis_of_rotation)),
-                                    joint_orientations)
+        update_chain_orientations(path,
+                                  i,
+                                  R.from_rotvec(
+                                      angle_of_rotation * axis_of_rotation / np.linalg.norm(axis_of_rotation)),
+                                  joint_orientations)
 
         joint_positions = pose_joint_positions(initial_joint_positions[0],
                                                joint_parents,
