@@ -50,3 +50,36 @@ def cyclic_coordinate_descent(path: List[int],
         i = (i + order) % (len(path) - 1)
 
     return joint_positions, np.stack([o.as_quat() for o in joint_orientations])
+
+
+def gradient_descent(positions: np.ndarray,
+                     joint_orientations: np.ndarray,
+                     parents: List[int],
+                     joint_offsets: np.ndarray,
+                     root_index: int,
+                     start2end: List[int],
+                     target: np.ndarray,
+                     learning_rate: float = 1,
+                     max_iterations: int = 10,
+                     max_error: float = 0.01) -> Tuple[np.ndarray, np.ndarray]:
+    orientations, indices = link_orientations(joint_orientations, parents, start2end, root_index)
+    # the same orientation may occur twice, as desired.
+    links = manipulator_links(positions, start2end)
+    # include all links connect the root, as desired.
+    error, error_norm = forward(positions, start2end, links, target)
+
+    iteration_count = 0
+    while iteration_count < max_iterations and max_error < error_norm:
+        loss_gradient = backward(links, root_index, error)
+
+        links, orientations = step(orientations, links, loss_gradient, learning_rate)
+
+        error, error_norm = forward(positions, start2end, links, target)
+
+        iteration_count += 1
+
+    joint_orientations = update_joint_orientations(joint_orientations, orientations, indices)
+
+    return (pose_joint_positions(link_position(positions, start2end, links, root_index),
+                                 parents, joint_offsets, joint_orientations),
+            joint_orientations)
