@@ -114,7 +114,7 @@ def link_orientations(orientations: np.ndarray,
         else:
             indices = parents[start2end[:-1]]
 
-    return R.from_quat(orientations[indices]), indices
+    return orientations[indices], indices
 
 
 def manipulator_links(joint_positions: np.ndarray,
