@@ -76,7 +76,7 @@ def forward(joint_positions: np.ndarray,
             links: np.ndarray,
             target: np.ndarray):
     """
-    Compute the output of the loss function, i.e. displacement (error) from target to end effector position, and its L2
+    Compute the output of the loss function, i.e. displacement (error) from target to end effector, and its L2
     norm.
     @param joint_positions: n x 3 numpy array of positions of all joints.
     @param start2end: indices of joints in the manipulator.
