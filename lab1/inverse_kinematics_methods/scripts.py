@@ -156,4 +156,5 @@ def link_position(joint_positions: np.ndarray,
     @param i: index of the joint of which we are computing the position for.
     @return: 3 array of position of i-th joint
     """
+    assert i is None or 0 <= i <= links.shape[0]
     return joint_positions[start2end[0]] + np.sum(links[:i], axis=0)
