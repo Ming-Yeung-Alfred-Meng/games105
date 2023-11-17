@@ -124,7 +124,7 @@ class Forward(unittest.TestCase):
                               [39, 62, 96],
                               [69, -55, 99]])
         start2end = [3, 4, 2, 1]
-        links = np.array([[30, -117,    3], [-162, 47, -96], [112, -77, -83]])
+        links = np.array([[30, -117, 3], [-162, 47, -96], [112, -77, -83]])
         target = np.array([12, 57, 27])
         error_expected = np.array([7, -142, -107])
         error_norm_expected = 177.93819151604302

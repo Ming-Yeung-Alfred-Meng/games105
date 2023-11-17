@@ -33,12 +33,12 @@ class MetaData:
         # 从end节点开始，一直往上找，直到找到腰部节点
         end2root = [self.joint_name.index(self.end_joint)]
         while self.joint_parent[end2root[-1]] != -1:
-            end2root.append(self.joint_parent[end2root[-1]]) # when loop finishes, root i.e. 0 is in end2root.
+            end2root.append(self.joint_parent[end2root[-1]])  # when loop finishes, root i.e. 0 is in end2root.
 
         # 从root节点开始，一直往上找，直到找到腰部节点
         start2root = [self.joint_name.index(self.start_joint)]
         while self.joint_parent[start2root[-1]] != -1:
-            start2root.append(self.joint_parent[start2root[-1]]) # when loop finishes, root i.e. 0 is in start2root.
+            start2root.append(self.joint_parent[start2root[-1]])  # when loop finishes, root i.e. 0 is in start2root.
 
         # 合并路径，消去重复的节点
         while end2root and start2root and start2root[-1] == end2root[-1]:
