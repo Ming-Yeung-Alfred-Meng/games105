@@ -47,8 +47,20 @@ def part2_inverse_kinematics(meta_data, joint_positions, joint_orientations, rel
     """
     输入lWrist相对于RootJoint前进方向的xz偏移，以及目标高度，IK以外的部分与bvh一致
     """
+    start2end, _, root_index = meta_data.get_path_from_root_to_end()
+    joint_offsets = joint_offsets_from_positions(meta_data.joint_initial_position, meta_data.joint_parent)
 
-    return joint_positions, joint_orientations
+    return gradient_descent(joint_positions,
+                            joint_orientations,
+                            meta_data.joint_parent,
+                            joint_offsets,
+                            root_index,
+                            start2end,
+                            np.array([joint_positions[0, 0] + relative_x,
+                                      target_height,
+                                      joint_positions[0, 2] + relative_z]),
+                            learning_rate=2,
+                            max_iterations=20)
 
 
 def bonus_inverse_kinematics(meta_data, joint_positions, joint_orientations, left_target_pose, right_target_pose):
