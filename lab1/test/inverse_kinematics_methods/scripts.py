@@ -324,5 +324,64 @@ class LinkPosition(unittest.TestCase):
         self.assertTrue(np.allclose(position_actual, position_expected))
 
 
+class UpdateRoot(unittest.TestCase):
+
+    def setUp(self):
+        self.positions = np.array([[-71, -33, 37],
+                                   [64, -85, 70],
+                                   [15, 0, -4],
+                                   [55, 54, -66],
+                                   [-36, -72, -16]])
+
+    def test_root_as_start(self):
+        start2end = [0, 4, 2, 3]
+        links = np.array([[-92, 78, 35],
+                          [89, 18, 13],
+                          [60, -52, 42]])
+        # do NOT compute links from self.positions, as links are in general not offsets.
+        root_index = 0
+
+        root_expected = np.array([-71, -33, 37])
+
+        root_actual = update_root(self.positions, start2end, links, root_index)
+        self.assertTrue(np.allclose(root_actual, root_expected))
+
+    def test_root_as_end(self):
+        start2end = [3, 4, 2, 0]
+        links = np.array([[90, 30, 15],
+                          [31, -75, 35],
+                          [-4, 57, 44]])
+        root_index = 3
+
+        root_expected = np.array([-71, -33, 37])
+
+        root_actual = update_root(self.positions, start2end, links, root_index)
+        self.assertTrue(np.allclose(root_actual, root_expected))
+
+    def test_root_as_intermediate_joint(self):
+        start2end = [1, 3, 0, 4]
+        links = np.array([[38, -43, 17],
+                          [10, 18, 73],
+                          [8, -59, -95]])
+        root_index = 2
+
+        root_expected = np.array([112, -110, 160])
+
+        root_actual = update_root(self.positions, start2end, links, root_index)
+        self.assertTrue(np.allclose(root_actual, root_expected))
+
+    def test_root_not_in_manipulator(self):
+        start2end = [4, 3, 2, 1]
+        links = np.array([[-4, -99, 99],
+                          [78, -52, 89],
+                          [19, -84, 6]])
+        root_index = -1
+
+        root_expected = np.array([-71, -33, 37])
+
+        root_actual = update_root(self.positions, start2end, links, root_index)
+        self.assertTrue(np.allclose(root_actual, root_expected))
+
+
 if __name__ == '__main__':
     unittest.main()

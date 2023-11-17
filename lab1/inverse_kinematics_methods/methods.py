@@ -81,7 +81,6 @@ def gradient_descent(positions: np.ndarray,
         iteration_count += 1
 
     joint_orientations = update_joint_orientations(joint_orientations, orientations.as_quat(), indices)
-
-    return (pose_joint_positions(link_position(positions, start2end, links, root_index),
+    return (pose_joint_positions(update_root(positions, start2end, links, root_index),
                                  parents, joint_offsets, joint_orientations),
             joint_orientations)

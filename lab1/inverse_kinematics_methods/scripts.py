@@ -158,3 +158,16 @@ def link_position(joint_positions: np.ndarray,
     """
     assert i is None or 0 <= i <= links.shape[0]
     return joint_positions[start2end[0]] + np.sum(links[:i], axis=0)
+
+
+def update_root(positions: np.ndarray,
+                start2end: List[int],
+                links: np.ndarray,
+                root_index: int) -> np.ndarray:
+    assert 2 <= len(start2end)
+    assert -1 <= root_index <= len(start2end) - 1
+
+    if 0 < root_index < len(start2end) - 1:
+        return link_position(positions, start2end, links, root_index)
+    else:
+        return positions[0]
