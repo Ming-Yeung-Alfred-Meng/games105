@@ -34,6 +34,8 @@ def jacobian_transpose(links: np.ndarray,
     @param links: m x 3 numpy array of links.
     @return: 3m x 3 numpy array. Transpose of the Jacobian of end effector position w.r.t. all joint angles.
     """
+    assert -1 <= root_index <= links.shape[0]
+
     result = np.cross(np.eye(3), links[:, None, :]).reshape(-1, 3)
     if 0 < root_index < links.shape[0]:
         result[3 * (root_index - 1): 3 * (root_index - 1) + 3] += result[3 * root_index: 3 * root_index + 3]
@@ -51,6 +53,8 @@ def backward(links: np.ndarray,
     @param error: 3 numpy array of displacement from target to end effector, i.e. end - target.
     @return: 3m numpy array of loss gradient.
     """
+    assert -1 <= root_index <= links.shape[0]
+
     return jacobian_transpose(links, root_index) @ error
 
 
@@ -84,6 +88,8 @@ def forward(joint_positions: np.ndarray,
     @param target: 3 array of target position.
     @return: 3 numpy array of end effector position.
     """
+    assert 2 <= len(start2end)
+
     error = link_position(joint_positions, start2end, links) - target
     return error, np.linalg.norm(error)
 
@@ -102,7 +108,7 @@ def link_orientations(orientations: np.ndarray,
     @return: o x 4 numpy array of orientations of joints in the manipulator, and their indices into "orientations".
     """
     assert 2 <= len(start2end)
-    assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
+    assert -1 <= root_index <= len(start2end) - 1
 
     parents = np.array(parents)
     start2end = np.array(start2end)
@@ -126,6 +132,8 @@ def manipulator_links(joint_positions: np.ndarray,
     @param start2end: indices (relative to joint_positions) of joints in the manipulator.
     @return: m x 3 array of links.
     """
+    assert 2 <= len(start2end)
+
     return joint_positions[start2end][1:] - joint_positions[start2end][:-1]
 
 
@@ -156,6 +164,7 @@ def link_position(joint_positions: np.ndarray,
     @param i: index of the joint of which we are computing the position for.
     @return: 3 array of position of i-th joint
     """
+    assert 2 <= len(start2end)
     assert i is None or 0 <= i <= links.shape[0]
     return joint_positions[start2end[0]] + np.sum(links[:i], axis=0)
 
