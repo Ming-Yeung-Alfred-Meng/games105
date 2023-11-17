@@ -59,11 +59,11 @@ def step(orientations: R,
          loss_gradient: np.ndarray,
          learning_rate: float = 1) -> Tuple[np.ndarray, R]:
     """
-    Update links and their orientations.
+    Update links and their orientations using gradient descent.
+    @param orientations: m scipy rotations defining the orientations of links.
+    @param links: m x 3 array of links in the manipulator.
     @param loss_gradient: m array of gradient of loss function w.r.t. joint angles.
     @param learning_rate: amount to step in the direction of loss_gradient.
-    @param links: m x 3 array of links in the manipulator.
-    @param orientations: m scipy rotations defining the orientations of links.
     @return: updated links and orientations.
     """
     rotations = R.from_euler("XYZ", (- learning_rate * loss_gradient).reshape(-1, 3))
