@@ -246,7 +246,7 @@ class LinkOrientations(unittest.TestCase):
 
 
 class ManipulatorLinks(unittest.TestCase):
-    def test_something(self):
+    def test_simple(self):
         positions = np.array([[-56, -32, 98],
                               [18, -59, -30],
                               [29, -53, 46],
@@ -261,7 +261,7 @@ class ManipulatorLinks(unittest.TestCase):
 
 
 class UpdateJointOrientation(unittest.TestCase):
-    def test_something(self):
+    def test_simple(self):
         joint_orientations = np.array([[5, -9, -2, 8],
                                        [9, -2, -6, -8],
                                        [-4, 9, 2, 2],
