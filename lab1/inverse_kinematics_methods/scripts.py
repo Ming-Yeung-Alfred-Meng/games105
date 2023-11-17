@@ -104,15 +104,12 @@ def link_orientations(orientations: np.ndarray,
     assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
 
     parents = np.array(parents)
+    start2end = np.array(start2end)
 
-    if root_index == 0:
-        indices = parents[start2end[1:]]
-    elif 0 < root_index < len(start2end) - 1:
-        indices = parents[start2end]
-    elif root_index == len(start2end) - 1:
-        indices = parents[start2end[:-1]]
-    else:  # root_index == -1
-        if parents[start2end[0]] != start2end[0]:
+    if root_index != -1:
+        indices = parents[start2end[start2end != 0]]
+    else:  # 0 is not in start2end
+        if parents[start2end[0]] != start2end[1]:
             indices = parents[start2end[1:]]
         else:
             indices = parents[start2end[:-1]]
