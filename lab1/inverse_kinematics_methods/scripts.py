@@ -91,7 +91,7 @@ def forward(joint_positions: np.ndarray,
 def link_orientations(orientations: np.ndarray,
                       parents: List[int],
                       start2end: List[int],
-                      root_index: int) -> Tuple[R, np.ndarray]:
+                      root_index: int) -> Tuple[np.ndarray, np.ndarray]:
     """
     Return scipy rotations representing the orientations of links in the manipulator, and their indices into the
     array of all orientations.
@@ -99,7 +99,7 @@ def link_orientations(orientations: np.ndarray,
     @param parents: parents[i] stores the index of i-th joint's parent.
     @param start2end: indices of joints in the manipulator.
     @param root_index: index of the root, i.e. 0 in "start2end".
-    @return: m scipy rotations of orientations of joints in the manipulator, and their indices into "orientations".
+    @return: o x 4 numpy array of orientations of joints in the manipulator, and their indices into "orientations".
     """
     assert 2 <= len(start2end)
     assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
