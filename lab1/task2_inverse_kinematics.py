@@ -99,8 +99,8 @@ def part1_animation(viewer, target_pos):
     marker = viewer.create_marker(target_pos, [1, 0, 0, 1])
 
     joint_name, joint_parent, joint_initial_position = viewer.get_meta_data()
-    # meta_data = MetaData(joint_name, joint_parent, joint_initial_position, 'lToeJoint_end', 'lWrist_end')
-    meta_data = MetaData(joint_name, joint_parent, joint_initial_position, 'RootJoint', 'lWrist_end')
+    meta_data = MetaData(joint_name, joint_parent, joint_initial_position, 'rToeJoint_end', 'lWrist_end')
+    # meta_data = MetaData(joint_name, joint_parent, joint_initial_position, 'RootJoint', 'lWrist_end')
     joint_position = viewer.get_joint_positions()
     joint_orientation = viewer.get_joint_orientations()
 

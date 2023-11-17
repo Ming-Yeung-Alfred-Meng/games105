@@ -21,14 +21,26 @@ def part1_inverse_kinematics(meta_data,
         joint_positions: 计算得到的关节位置，是一个numpy数组，shape为(M, 3)，M为关节数
         joint_orientations: 计算得到的关节朝向，是一个numpy数组，shape为(M, 4)，M为关节数
     """
-    return cyclic_coordinate_descent(meta_data.get_path_from_root_to_end()[0],
-                                     target_end,
-                                     meta_data.joint_initial_position,
-                                     meta_data.joint_parent,
-                                     joint_positions,
-                                     joint_orientations,
-                                     max_iterations=10,
-                                     order=1)
+    start2end, _, root_index = meta_data.get_path_from_root_to_end()
+    joint_offsets = joint_offsets_from_positions(meta_data.joint_initial_position, meta_data.joint_parent)
+
+    return gradient_descent(joint_positions,
+                            joint_orientations,
+                            meta_data.joint_parent,
+                            joint_offsets,
+                            root_index,
+                            start2end,
+                            target_end,
+                            learning_rate=1,
+                            max_iterations=40)
+    # return cyclic_coordinate_descent(meta_data.get_path_from_root_to_end()[0],
+    #                                  target_end,
+    #                                  meta_data.joint_initial_position,
+    #                                  meta_data.joint_parent,
+    #                                  joint_positions,
+    #                                  joint_orientations,
+    #                                  max_iterations=10,
+    #                                  order=1)
 
 
 def part2_inverse_kinematics(meta_data, joint_positions, joint_orientations, relative_x, relative_z, target_height):
