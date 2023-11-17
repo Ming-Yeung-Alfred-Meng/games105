@@ -64,6 +64,7 @@ def gradient_descent(positions: np.ndarray,
                      max_iterations: int = 10,
                      max_error: float = 0.01) -> Tuple[np.ndarray, np.ndarray]:
     orientations, indices = link_orientations(joint_orientations, parents, start2end, root_index)
+    orientations = R.from_quat(orientations)
     # the same orientation may occur twice, as desired.
     links = manipulator_links(positions, start2end)
     # include all links connect the root, as desired.
