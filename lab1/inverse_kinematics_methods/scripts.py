@@ -101,6 +101,7 @@ def link_orientations(orientations: np.ndarray,
     @param root_index: index of the root, i.e. 0 in "start2end".
     @return: m scipy rotations of orientations of joints in the manipulator, and their indices into "orientations".
     """
+    assert 2 <= len(start2end)
     assert 0 <= root_index <= len(start2end) - 1 or root_index == -1
 
     parents = np.array(parents)
