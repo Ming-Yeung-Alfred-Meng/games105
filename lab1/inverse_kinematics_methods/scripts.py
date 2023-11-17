@@ -50,6 +50,7 @@ def backward(links: np.ndarray,
     """
     Compute the gradient of the loss function i.e. L2 distance between end effector and target w.r.t. joint angles.
     @param links: m x 3 numpy array of links.
+    @param root_index: index of root joint in the manipulator/start2end, -1 if it is not in it.
     @param error: 3 numpy array of displacement from target to end effector, i.e. end - target.
     @return: 3m numpy array of loss gradient.
     """
