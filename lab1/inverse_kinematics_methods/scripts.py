@@ -137,7 +137,7 @@ def update_joint_orientations(joint_orientations: np.ndarray,
     @param joint_orientations: n x 4 array of orientations, in which some of them are being updated.
     @param orientations: o x 4 new orientations.
     @param indices: indices into joint_orientations of orientations to be updated.
-    @return: n x 4 array of updated orientations.
+    @return: n x 4 array of updated joint_orientations.
     """
     result = joint_orientations.copy()
     result[indices] = orientations
