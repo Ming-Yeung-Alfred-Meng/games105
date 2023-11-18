@@ -38,41 +38,73 @@ def setUpModule():
 
 
 class JacobianTranspose(unittest.TestCase):
-    def setUp(self):
-        self.links = np.array([[-4, -10, -10],
-                               [-6, 2, 1],
-                               [2, -9, -5]])
 
     def test_root_as_start(self):
+        links = np.array([[-4, -10, -10],
+                          [-6, 2, 1],
+                          [2, -9, -5]])
         root_index = 0
 
-        jacobian_expected = np.array([[0, 10, -10],
-                                      [-10, 0, 4],
-                                      [10, -4, 0],
-                                      [0, -1, 2],
-                                      [1, 0, 6],
-                                      [-2, -6, 0],
+        jacobian_expected = np.array([[0, 14, -17],
+                                      [-14, 0, 8],
+                                      [17, -8, 0],
+                                      [0, 4, -7],
+                                      [-4, 0, 4],
+                                      [7, -4, 0],
                                       [0, 5, -9],
                                       [-5, 0, -2],
                                       [9, 2, 0]])
 
-        jacobian_actual = jacobian_transpose(self.links, root_index)
+        jacobian_actual = jacobian_transpose(links, root_index)
         self.assertTrue(np.allclose(jacobian_actual, jacobian_expected))
 
     def test_root_as_intermediate_joint(self):
+        links = np.array([[49, -98, -9],
+                          [99, -49, 91],
+                          [-17, 15, -25]])
         root_index = 1
 
-        jacobian_expected = np.array([[0, 9, -8],
-                                      [-9, 0, 10],
-                                      [8, -10, 0],
-                                      [0, 9, -8],
-                                      [-9, 0, 10],
-                                      [8, -10, 0],
-                                      [0, 5, -9],
-                                      [-5, 0, -2],
-                                      [9, 2, 0]])
+        jacobian_expected = np.array([[0, -57, -132],
+                                      [57, 0, -131],
+                                      [132, 131, 0],
+                                      [0, -57, -132],
+                                      [57, 0, -131],
+                                      [132, 131, 0],
+                                      [0, 25, 15],
+                                      [-25, 0, 17],
+                                      [-15, -17, 0]])
 
-        jacobian_actual = jacobian_transpose(self.links, root_index)
+        jacobian_actual = jacobian_transpose(links, root_index)
+        self.assertTrue(np.allclose(jacobian_actual, jacobian_expected))
+
+    def test_root_as_end(self):
+        links = np.array([[19, -59, 83],
+                          [-40, 0, 66]])
+        root_index = 2
+
+        jacobian_expected = np.array([[0, -149, -59],
+                                      [149, 0, 21],
+                                      [59, -21, 0],
+                                      [0, -66, 0],
+                                      [66, 0, 40],
+                                      [0, -40, 0]])
+
+        jacobian_actual = jacobian_transpose(links, root_index)
+        self.assertTrue(np.allclose(jacobian_actual, jacobian_expected))
+
+    def test_root_not_in_manipulator(self):
+        links = np.array([[79, 86, 17],
+                          [71, 83, 75]])
+        root_index = -1
+
+        jacobian_expected = np.array([[0, -92, 169],
+                                      [92, 0, -150],
+                                      [-169, 150, 0],
+                                      [0, -75, 83],
+                                      [75, 0, -71],
+                                      [-83, 71, 0]])
+
+        jacobian_actual = jacobian_transpose(links, root_index)
         self.assertTrue(np.allclose(jacobian_actual, jacobian_expected))
 
 
@@ -83,7 +115,7 @@ class Backward(unittest.TestCase):
                           [2, -9, -5]])
         error = np.array([7, -8, -4])
         root_index = 1
-        gradient_expected = np.array([-40, -103, 136, -40, -103, 136, -4, -27, 47])
+        gradient_expected = np.array([-44, -130, 183, -44, -130, 183, -4, -27, 47])
 
         gradient_actual = backward(links, root_index, error)
         self.assertTrue(np.allclose(gradient_actual, gradient_expected))
@@ -103,13 +135,13 @@ class Step(unittest.TestCase):
         learning_rate = 0.1940226470258245
 
         links_expected = np.array([[92.89717194, -70.41588183, -6.76158501],
-                                   [67.67579515, 73.89204398, -97.53949245],
-                                   [-2.22823835, -31.969674, 121.48652147],
-                                   [-13.11129701, -41.46180362, -96.11458126]])
+                                   [50.20442353, 61.49383734, -115.11743494],
+                                   [-104.03731298, 20.69907949, 67.33339154],
+                                   [-75.71978084, 68.75894965, -25.84031023]])
         orientations_expected = np.array([[0.36047663, 0.62122638, 0.64125761, 0.27004272],
-                                          [0.37013612, 0.07252064, -0.52608644, 0.76221589],
-                                          [0.2450443, 0.07423596, -0.45028199, -0.85538789],
-                                          [0.08266827, -0.80924838, 0.57837554, 0.06135758]])
+                                          [0.23974381, 0.01832774, -0.34639601, 0.90675068],
+                                          [-0.54044477, -0.34434155, 0.11950791, 0.7583312],
+                                          [-0.57084761, 0.24832479, 0.40450021, 0.66996073]])
 
         links_actual, orientations_actual = step(orientations, links, gradient, learning_rate)
         self.assertTrue(np.allclose(links_actual, links_expected))

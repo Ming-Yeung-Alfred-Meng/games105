@@ -36,9 +36,10 @@ def jacobian_transpose(links: np.ndarray,
     """
     assert -1 <= root_index <= links.shape[0]
 
-    result = np.cross(np.eye(3), links[:, None, :]).reshape(-1, 3)
+    result = np.cumsum(np.cross(np.eye(3, dtype=np.float64),
+                                links[:, None, :]).reshape(-1, 3, 3)[::-1],
+                       axis=0)[::-1].reshape(-1, 3)
     if 0 < root_index < links.shape[0]:
-        result[3 * (root_index - 1): 3 * (root_index - 1) + 3] += result[3 * root_index: 3 * root_index + 3]
         result[3 * root_index: 3 * root_index + 3] = result[3 * (root_index - 1): 3 * (root_index - 1) + 3]
 
     return result
@@ -71,7 +72,7 @@ def step(orientations: R,
     @param learning_rate: amount to step in the direction of loss_gradient.
     @return: updated links and orientations.
     """
-    rotations = R.from_euler("XYZ", (- learning_rate * loss_gradient).reshape(-1, 3))
+    rotations = R.concatenate(np.cumprod(R.from_euler("XYZ", (- learning_rate * loss_gradient).reshape(-1, 3))))
 
     return rotations.apply(links), rotations * orientations
 
