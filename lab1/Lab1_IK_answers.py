@@ -31,7 +31,7 @@ def part1_inverse_kinematics(meta_data,
                             root_index,
                             start2end,
                             target_end,
-                            learning_rate=1,
+                            learning_rate=0.5, # When the manipulator has many joints, smaller learning rate provides stability
                             max_iterations=40)
     # return cyclic_coordinate_descent(meta_data.get_path_from_root_to_end()[0],
     #                                  target_end,
@@ -59,7 +59,7 @@ def part2_inverse_kinematics(meta_data, joint_positions, joint_orientations, rel
                             np.array([joint_positions[0, 0] + relative_x,
                                       target_height,
                                       joint_positions[0, 2] + relative_z]),
-                            learning_rate=2,
+                            learning_rate=1,
                             max_iterations=20)
 
 
