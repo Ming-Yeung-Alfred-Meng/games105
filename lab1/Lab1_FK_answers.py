@@ -100,11 +100,12 @@ def rotation_array_to_float_array(rotations: np.ndarray) -> np.ndarray:
                     dtype=np.float64)
 
 
+# TODO: this function can be written using numpy to replace loops.
 def pose_joint_orientations(joint_names: List[str],
                             joint_parents: List[int],
                             pose: np.ndarray) -> np.ndarray:
     """
-
+    Compute the orientations of all links from a frame.
     @param joint_names: names of the joints.
     @param joint_parents: joint_parents[i] is the index of the parent of the i-th joint.
     @param pose: an array of motion data of one frame. The first three entries are the root positions, and the rest are
