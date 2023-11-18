@@ -1,40 +1,6 @@
 import unittest
-import numpy as np
-from lab1.inverse_kinematics_methods.scripts import *
 from lab1.task2_inverse_kinematics import *
 from lab1.Lab1_FK_answers import *
-
-root_as_start = None
-root_as_intermediate_joint = None
-
-
-class Character:
-    def __init__(self, bvh: str, target: np.ndarray, start: str, end: str):
-        self.start = start
-        self.end = end
-        self.target = target
-        self.joint_name, self.joint_parents, self.joint_offsets = part1_calculate_T_pose(bvh)
-        self.motion_data = load_motion_data(bvh)
-        self.joint_positions, self.joint_orientations = part2_forward_kinematics(self.joint_name,
-                                                                                 self.joint_parents,
-                                                                                 self.joint_offsets,
-                                                                                 self.motion_data,
-                                                                                 0)
-        self.meta_data = MetaData(self.joint_name, self.joint_parents, self.joint_positions, self.start, self.end)
-        self.start2end, self.start2end_names, self.root_index = self.meta_data.get_path_from_root_to_end()
-
-
-def setUpModule():
-    global root_as_start
-    global root_as_intermediate_joint
-
-    root_as_start = Character("..\\..\\data\\simple.bvh",
-                              np.array([1., 1., 1.]),
-                              "RootJoint",
-                              "Link1_end")
-    root_as_intermediate_joint = Character("..\\..\\data\\general_simple.bvh",
-                                           np.array([2., 2., 2.]),
-                                           'Link2_end', 'Link1_end')
 
 
 class JacobianTranspose(unittest.TestCase):
